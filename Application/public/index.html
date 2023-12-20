@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en" data-bs-theme="dark">
+
+<head>
+    <title>Tumor Detection with AI</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-T3c6CoIi6uLrA9TneNEoa7RxnatzjcDSCmG1MXxSR1GAsXEV/Dwwykc2MPK8M2HN" crossorigin="anonymous">
+</head>
+
+<style>
+    #uploadedImage {
+        display: block;
+        max-width: 100%;
+        height: auto;
+        border-radius: 12px;
+        margin: 0 auto;
+    }
+</style>
+
+<body>
+
+    <!-- Navigation Bar(Optional) -->
+    <nav class="navbar navbar-expand-lg navbar-dark ">
+        <div class="container">
+
+            <a class="navbar-brand" href="#">AI Tumor Detection</a>
+            <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+                <span class="navbar-toggler-icon"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <!-- Navigation Links can go here -->
+            </div>
+
+        </div>
+
+    </nav>
+
+    <div class="container mt-5 d-flex justify-content-center">
+        <div class="card " style="width: 420px;">
+            <div class="card-header text-white">
+                <h1 class="text-center">Tumor Detector</h1>
+            </div>
+            <div class="card-body">
+
+                <img id="uploadedImage" src="#" alt="Selected MRI Image" style="display: none;">
+
+                <div class="form-group border border-dashed p-3 mt-3">
+                    <label for="image">MRI Image:</label>
+                    <input type="file" id="image" name="image" class="form-control-file border-0 mt-3"
+                        onchange="displayImage(this)">
+                </div>
+                <button id="detectBtn" class="btn btn-primary btn-block mt-3">Detect</button>
+                <div id="result" class="my-0 alert alert-dismissible fade show" style="display: none;" role="alert">
+                    <h3>Results:</h3>
+                    <div id="predictionList"></div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- Optional JavaScript; choose one of the two! -->
+    <!-- Option 1: Bootstrap Bundle with Popper -->
+    <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"
+        integrity="sha384-C6RzsynM9kWDrMNeT87bh95OGNyZPhcTNXj1NW7RuBCsyN/o0jlpcV8Qyq46cDfL"
+        crossorigin="anonymous"></script>
+    <!-- Detection Script -->
+    <script>
+
+        function displayImage(input) {
+            // Check if any files were selected
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                // Function to execute when file is read
+                reader.onload = function (e) {
+                    // Get the image element and display it
+                    var uploadedImage = document.getElementById('uploadedImage');
+                    uploadedImage.style.display = 'block'; // Show the image element
+                    uploadedImage.src = e.target.result; // Set the src to the read file
+                };
+
+                // Read the selected file as a data URL
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+
+        document.getElementById('detectBtn').addEventListener('click', function () {
+            var fileInput = document.getElementById('image');
+            var file = fileInput.files[0];
+            var formData = new FormData();
+            formData.append('file', file);
+
+            fetch('/detect', {
+                method: 'POST',
+                body: formData
+            })
+                .then(response => response.json())
+                .then(data => {
+                    document.getElementById('result').style.display = 'block';
+                    var predictions = data.predictions;
+                    var sortedPredictions = Object.keys(predictions).sort(function (a, b) { return predictions[b] - predictions[a] });
+                    var predictionList = document.getElementById('predictionList');
+                    predictionList.innerHTML = '';
+                    sortedPredictions.forEach(function (key) {
+                        var p = document.createElement('p');
+                        p.textContent = key + ': ' + predictions[key].toFixed(2);
+                        predictionList.appendChild(p);
+                    });
+                })
+                .catch(error => console.error('Error:', error));
+        });
+    </script>
+
+</body>
+
+</html>
+
+</html>
