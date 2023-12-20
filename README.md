@@ -5,7 +5,7 @@ Deep learning enables us to detect tumors from MRI images
 
 ### - docker-compose
 Use this command to start a web server with **FastAPI** on port 8000, accessible from 127.0.0.1:8000:
-`docker compose up`
+```docker compose up```
 ### - docker hub
 Download the image directly from Docker Hub here: [this link](https://hub.docker.com/r/mahdighaemi/tumor_detector)
 
